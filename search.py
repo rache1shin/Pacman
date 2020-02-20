@@ -73,50 +73,50 @@ def tinyMazeSearch(problem):
     return  [s, s, w, s, w, w, s, w]
 
 def depthFirstSearch(problem):
-    """
-    Search the deepest nodes in the search tree first.
-
-    Your search algorithm needs to return a list of actions that reaches the
-    goal. Make sure to implement a graph search algorithm.
-
-    To get started, you might want to try some of these simple commands to
-    understand the search problem that is being passed in:
-
-    print "Start:", problem.getStartState()
-    print "Is the start a goal?", problem.isGoalState(problem.getStartState())
-    print "Start's successors:", problem.getSuccessors(problem.getStartState())
-    """
     from util import Stack
     stk = Stack()
-    obj = [problem.getStartState,[],[problem.getStartState()]]
+    obj = [problem.getStartState(),[],[problem.getStartState()]]    # [ current location, [list of directions], [list of past locations] ]
     stk.push(obj)
-    print "Start:", problem.getStartState()
-    print "Is the start a goal?", problem.isGoalState(problem.getStartState())
-    print "Start's successors:", problem.getSuccessors(problem.getStartState())
     while not stk.isEmpty():
         nowObj = stk.pop()
         nowLocation = nowObj[0]
         path = nowObj[1]
         pastLocations = nowObj[2]
+        if problem.isGoalState(nowLocation):
+            return path
         successorObjs = problem.getSuccessors(nowLocation)
+        successorObjs.reverse() # Successors comes in North, South, East, West order but I want to visit South before North. hence, Reverse()
         for s in successorObjs:
-            if problem.isGoalState(s[0]):
-                return path
             if s[0] not in pastLocations:
-                path.append(s[1])
-                pastLocations.append(s[0])
-                stk.push([s[0],path,pastLocations])
-    return []
+                # making temp lists to copy original ones because I only modify lists to put them on stack
+                tmpPath = list(path)
+                tmpPath.append(s[1])
+                tmpPastLocations = list(pastLocations)
+                tmpPastLocations.append(s[0])
+                stk.push([s[0],tmpPath,tmpPastLocations])
 
 def breadthFirstSearch(problem):
-    """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from util import Queue
+    queue = Queue()
+    obj = [problem.getStartState(), []]
+    visited = [problem.getStartState()] # we do not visit the node again in any circumstance
+    queue.push(obj)
+    while not queue.isEmpty():
+        nowObj = queue.pop()
+        nowLocation = nowObj[0]
+        path = nowObj[1]
+        if problem.isGoalState(nowLocation):
+            return path
+        successorObjs = problem.getSuccessors(nowLocation)  # no reverse() because directions are not important in BFS
+        for s in successorObjs:
+            if s[0] not in visited:
+                visited.append(s[0])
+                tmpPath = list(path)
+                tmpPath.append(s[1])
+                queue.push([s[0], tmpPath])
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
     """
